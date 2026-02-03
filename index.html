@@ -199,7 +199,8 @@
         <div class="contact-card">
             <h2>Kapcsolat</h2>
             <p style="margin-bottom:1.5rem; color:var(--text-muted);">Írjon nekünk üzenetet!</p>
-            <form action="https://formspree.io/f/milan.nagy.081025@gmail.com" method="POST" id="contact-form">
+            <form action="https://api.web3forms.com/submit" method="POST" id="contact-form">
+                <input type="hidden" name="access_key" value="ac6453f5-0a13-419b-958d-e1c631c01aeb">
                 <input type="text" name="name" placeholder="Név" required>
                 <input type="email" name="email" placeholder="E-mail" required>
                 <textarea name="message" rows="4" placeholder="Üzenet..." required></textarea>
@@ -313,4 +314,5 @@
         init();
     </script>
 </body>
+
 </html>
