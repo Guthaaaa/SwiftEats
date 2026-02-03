@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwiftEats | Gyors és Friss</title>
+    <title>SwiftEats | Modern Food Delivery</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
 
@@ -94,9 +94,30 @@
             text-align: center;
         }
 
-        /* --- GRID & CARDS --- */
+        /* --- CONTAINER & BUTTONS --- */
         .container { max-width: 1100px; margin: 4rem auto; padding: 0 20px; }
         
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        /* --- MENU --- */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -114,40 +135,21 @@
         .food-card:hover { transform: translateY(-5px); }
         .food-card img { width: 100%; height: 180px; object-fit: cover; }
         .card-content { padding: 1.5rem; }
-
         .price { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
 
-        .btn {
-            background: var(--primary);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover { background: var(--primary-dark); }
-
-        /* --- CONTACT FORM --- */
-        .contact-card {
+        /* --- CONTACT SECTION (UPDATED TO BUTTON) --- */
+        .contact-box {
             background: var(--light);
-            padding: 2.5rem;
+            padding: 3rem;
             border-radius: 25px;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
+            text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            outline-color: var(--primary);
-        }
+        .contact-box h2 { margin-bottom: 10px; font-size: 2rem; }
+        .contact-box p { color: var(--text-muted); margin-bottom: 30px; }
 
         /* --- MODAL --- */
         .modal {
@@ -168,12 +170,21 @@
         }
 
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline-color: var(--primary);
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo-container">
+        <div class="logo-container" onclick="document.getElementById('logo-upload').click()">
             <img id="logo-img" src="" alt="Logo">
             <span id="logo-text" class="logo-text">SwiftEats</span>
             <input type="file" id="logo-upload" hidden accept="image/*" onchange="uploadLogo(event)">
@@ -196,17 +207,14 @@
     </div>
 
     <div class="container" id="contact-section">
-        <div class="contact-card">
+        <div class="contact-box">
             <h2>Kapcsolat</h2>
-            <p style="margin-bottom:1.5rem; color:var(--text-muted);">Írjon nekünk üzenetet!</p>
-            <form action="https://api.web3forms.com/submit" method="POST" id="contact-form">
-                <input type="hidden" name="access_key" value="ac6453f5-0a13-419b-958d-e1c631c01aeb">
-                <input type="text" name="name" placeholder="Név" required>
-                <input type="email" name="email" placeholder="E-mail" required>
-                <textarea name="message" rows="4" placeholder="Üzenet..." required></textarea>
-                <button type="submit" class="btn" style="width:100%">Küldés</button>
-            </form>
-            <div id="form-status" style="margin-top:10px; text-align:center;"></div>
+            <p>Kérdése van, vagy visszajelzést küldene? Kattintson az alábbi gombra az űrlap megnyitásához!</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdWjUyKJM_vMjzBKetF_jCmLkm8ppVRRwGZmRrW8wDCKMjdSw/viewform?usp=publish-editor" 
+               target="_blank" 
+               class="btn">
+               Google Űrlap Megnyitása
+            </a>
         </div>
     </div>
 
@@ -233,8 +241,9 @@
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (event) => {
-                document.getElementById('logo-img').src = event.target.result;
-                document.getElementById('logo-img').style.display = 'block';
+                const logoImg = document.getElementById('logo-img');
+                logoImg.src = event.target.result;
+                logoImg.style.display = 'block';
                 document.getElementById('logo-text').style.display = 'none';
             };
             if(file) reader.readAsDataURL(file);
@@ -275,7 +284,9 @@
         function updateUI() {
             document.getElementById('cart-counter').innerText = cart.length;
             const list = document.getElementById('cart-items-list');
-            list.innerHTML = cart.map(item => `<div class="cart-item"><span>${item.name}</span><span>${item.price} Ft</span></div>`).join('');
+            list.innerHTML = cart.length === 0 ? '<p>A kosarad üres</p>' : 
+                cart.map(item => `<div class="cart-item"><span>${item.name}</span><span>${item.price} Ft</span></div>`).join('');
+            
             const total = cart.reduce((s, item) => s + item.price, 0);
             document.getElementById('cart-total').innerText = `${total} Ft`;
         }
@@ -291,28 +302,9 @@
             cart = []; updateUI(); toggleModal();
         }
 
-        // CONTACT FORM AJAX
-        const form = document.getElementById('contact-form');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const status = document.getElementById('form-status');
-            const response = await fetch(e.target.action, {
-                method: 'POST',
-                body: new FormData(e.target),
-                headers: { 'Accept': 'application/json' }
-            });
-            if (response.ok) {
-                status.innerText = "Sikeres küldés!";
-                form.reset();
-            } else {
-                status.innerText = "Hiba történt.";
-            }
-        };
-
         function scrollToId(id) { document.getElementById(id).scrollIntoView(); }
 
         init();
     </script>
 </body>
-
 </html>
