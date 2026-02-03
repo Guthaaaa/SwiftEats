@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftEats | Gyors és Friss</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+
+    <style>
+        :root {
+            --primary: #ff4757;
+            --primary-dark: #e84118;
+            --dark: #2f3542;
+            --light: #ffffff;
+            --gray: #f1f2f6;
+            --text-muted: #747d8c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--gray);
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 10%;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            gap: 10px;
+        }
+
+        #logo-img { max-height: 40px; display: none; border-radius: 5px; }
+
+        .logo-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            margin-left: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        #cart-counter {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            height: 40vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        /* --- GRID & CARDS --- */
+        .container { max-width: 1100px; margin: 4rem auto; padding: 0 20px; }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .food-card {
+            background: var(--light);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .food-card:hover { transform: translateY(-5px); }
+        .food-card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-content { padding: 1.5rem; }
+
+        .price { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover { background: var(--primary-dark); }
+
+        /* --- CONTACT FORM --- */
+        .contact-card {
+            background: var(--light);
+            padding: 2.5rem;
+            border-radius: 25px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline-color: var(--primary);
+        }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 450px;
+        }
+
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo-container">
+            <img id="logo-img" src="" alt="Logo">
+            <span id="logo-text" class="logo-text">SwiftEats</span>
+            <input type="file" id="logo-upload" hidden accept="image/*" onchange="uploadLogo(event)">
+        </div>
+        <div class="nav-links">
+            <a onclick="scrollToId('menu-section')">Étlap</a>
+            <a onclick="scrollToId('contact-section')">Kapcsolat</a>
+            <a onclick="toggleModal()">Kosár <span id="cart-counter">0</span></a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>SwiftEats</h1>
+        <p>Prémium ételek, villámgyors kiszállítás.</p>
+    </header>
+
+    <div class="container" id="menu-section">
+        <h2 style="margin-bottom:2rem;">Népszerű ételeink</h2>
+        <div class="menu-grid" id="menu-container"></div>
+    </div>
+
+    <div class="container" id="contact-section">
+        <div class="contact-card">
+            <h2>Kapcsolat</h2>
+            <p style="margin-bottom:1.5rem; color:var(--text-muted);">Írjon nekünk üzenetet!</p>
+            <form action="https://formspree.io/f/milan.nagy.081025@gmail.com" method="POST" id="contact-form">
+                <input type="text" name="name" placeholder="Név" required>
+                <input type="email" name="email" placeholder="E-mail" required>
+                <textarea name="message" rows="4" placeholder="Üzenet..." required></textarea>
+                <button type="submit" class="btn" style="width:100%">Küldés</button>
+            </form>
+            <div id="form-status" style="margin-top:10px; text-align:center;"></div>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <span style="float:right; cursor:pointer; font-size:1.5rem" onclick="toggleModal()">&times;</span>
+            <h2 style="margin-bottom:1.5rem">Kosár</h2>
+            <div id="cart-items-list"></div>
+            <hr style="margin:15px 0">
+            <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; margin-bottom:1.5rem">
+                <span>Összesen:</span>
+                <span id="cart-total">0 Ft</span>
+            </div>
+            <form onsubmit="handleCheckout(event)">
+                <input type="text" placeholder="Szállítási cím" required>
+                <button type="submit" class="btn" style="width:100%">Rendelés Leadása</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // LOGO
+        function uploadLogo(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('logo-img').src = event.target.result;
+                document.getElementById('logo-img').style.display = 'block';
+                document.getElementById('logo-text').style.display = 'none';
+            };
+            if(file) reader.readAsDataURL(file);
+        }
+
+        // DATA & MENU
+        const products = [
+            { name: "Truffle Burger", price: 4200, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" },
+            { name: "Margherita Pizza", price: 3500, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400" },
+            { name: "Salmon Poke", price: 4800, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" },
+            { name: "Crunchy Tacos", price: 3200, img: "https://images.unsplash.com/photo-1512838243191-e81e8f66f1fd?w=400" }
+        ];
+
+        let cart = [];
+
+        function init() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = products.map((p, i) => `
+                <div class="food-card">
+                    <img src="${p.img}">
+                    <div class="card-content">
+                        <h3>${p.name}</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px">
+                            <span class="price">${p.price} Ft</span>
+                            <button class="btn" style="padding:5px 15px" onclick="addToCart(${i})">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // CART LOGIC
+        function addToCart(i) {
+            cart.push(products[i]);
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('cart-counter').innerText = cart.length;
+            const list = document.getElementById('cart-items-list');
+            list.innerHTML = cart.map(item => `<div class="cart-item"><span>${item.name}</span><span>${item.price} Ft</span></div>`).join('');
+            const total = cart.reduce((s, item) => s + item.price, 0);
+            document.getElementById('cart-total').innerText = `${total} Ft`;
+        }
+
+        function toggleModal() {
+            const m = document.getElementById('checkout-modal');
+            m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function handleCheckout(e) {
+            e.preventDefault();
+            alert("Rendelés elküldve!");
+            cart = []; updateUI(); toggleModal();
+        }
+
+        // CONTACT FORM AJAX
+        const form = document.getElementById('contact-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('form-status');
+            const response = await fetch(e.target.action, {
+                method: 'POST',
+                body: new FormData(e.target),
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                status.innerText = "Sikeres küldés!";
+                form.reset();
+            } else {
+                status.innerText = "Hiba történt.";
+            }
+        };
+
+        function scrollToId(id) { document.getElementById(id).scrollIntoView(); }
+
+        init();
+    </script>
+</body>
+</html>
